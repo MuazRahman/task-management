@@ -13,7 +13,8 @@ import '../utils/app_color.dart';
 import '../widgets/screen_background.dart';
 
 class ForgotPasswordVerifyOtpScreen extends StatefulWidget {
-  const ForgotPasswordVerifyOtpScreen({super.key,});
+  final String email;
+  const ForgotPasswordVerifyOtpScreen({super.key, required this.email});
 
   static const String name = '/forgot-password/verify-otp';
 
@@ -26,14 +27,15 @@ class _ForgotPasswordVerifyOtpScreenState extends State<ForgotPasswordVerifyOtpS
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _getVerifyOTPInProgress = false;
   RecoverVerifyOTP? recoverVerifyOtp;
-  String? email;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print(email);
-    email = ModalRoute.of(context)?.settings.arguments as String?;
-  }
+  // String? email;
+  //
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   // print(email);
+  //   email = ModalRoute.of(context)?.settings.arguments as String?;
+  //   print(email);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -107,10 +109,10 @@ class _ForgotPasswordVerifyOtpScreenState extends State<ForgotPasswordVerifyOtpS
   Future<void> _getVerifyOTP() async {
     _getVerifyOTPInProgress = true;
     setState(() {});
-    print(email);
+    print(widget.email);
     final NetworkResponse response = await NetworkCaller.getRequest(
         url: Urls.recoverVerifyOTPlUrl(
-            email ?? '',
+            widget.email ?? '',
             _otpTEController.text.trim()),
     );
     _getVerifyOTPInProgress = false;
@@ -184,5 +186,6 @@ class _ForgotPasswordVerifyOtpScreenState extends State<ForgotPasswordVerifyOtpS
   void dispose() {
     super.dispose();
     _otpTEController.dispose();
+
   }
 }

@@ -119,9 +119,10 @@ class _ForgotPasswordVerifyEmailScreenState extends State<ForgotPasswordVerifyEm
     if (response.isSuccess) {
       recoverVerifyEmail = RecoverVerifyEmail.fromJson(response.responseData!);
       if (recoverVerifyEmail!.status == 'success') {
-        String email = recoverVerifyEmail!.recoverVerifyEmailData!.accepted.toString();
+        String email = _emailTEController.text.trim();
         print("Email is => $email");
-        Navigator.pushNamed(context, ForgotPasswordVerifyOtpScreen.name, arguments: email);
+        // Navigator.to(context, ForgotPasswordVerifyOtpScreen.name, arguments: email);
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordVerifyOtpScreen(email: email)));
       }
       else {
         showSnackBarMessage(context, 'No user found');
