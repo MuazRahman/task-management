@@ -82,9 +82,10 @@ class TaskManagerApp extends StatelessWidget {
         // else if (settings.name == ForgotPasswordVerifyOtpScreen.name) {
         //   widget = const ForgotPasswordVerifyOtpScreen();
         //}
-        else if (settings.name == ResetPasswordScreen.name) {
-          widget = const ResetPasswordScreen();
-        } else if (settings.name == MainBottomNavScreen.name) {
+        // else if (settings.name == ResetPasswordScreen.name) {
+        //   widget = const ResetPasswordScreen();
+        // }
+        else if (settings.name == MainBottomNavScreen.name) {
           widget = const MainBottomNavScreen();
         } else if (settings.name == AddNewTaskScreen.name) {
           widget = const AddNewTaskScreen();

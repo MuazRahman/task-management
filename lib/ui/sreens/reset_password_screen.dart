@@ -1,12 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/reset_password_model.dart';
+import 'package:task_manager/data/services/network_caller.dart';
+import 'package:task_manager/data/utils/urls.dart';
 import 'package:task_manager/ui/sreens/sign_in_screen.dart';
+import 'package:task_manager/ui/widgets/centered_circular_progress_indicator.dart';
+import 'package:task_manager/ui/widgets/snack_bar_message.dart';
 
 import '../utils/app_color.dart';
 import '../widgets/screen_background.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String email;
+  final String otp;
+  const ResetPasswordScreen({super.key, required this.email, required this.otp});
 
   static const String name = '/forgot-password/reset-password';
 
@@ -20,6 +27,8 @@ class _ResetPasswordScreenState
   final TextEditingController _newPasswordTEController = TextEditingController();
   final TextEditingController _confirmPasswordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _resetPasswordInProgress = false;
+  ResetPassword? resetPassword;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +68,12 @@ class _ResetPasswordScreenState
                     decoration: const InputDecoration(
                       hintText: 'New Password'
                     ),
+                    validator: (String? value) {
+                      if(value!.isEmpty && int.parse(value) < 6) {
+                          return 'Enter a new password more than 6 letter';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8,),
                   TextFormField(
@@ -66,13 +81,25 @@ class _ResetPasswordScreenState
                     decoration: const InputDecoration(
                         hintText: 'Confirm new Password'
                     ),
+                    validator: (String? value) {
+                      if(value!.isEmpty && int.parse(value) < 6) {
+                        return 'Enter password again';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(
                     height: 24,
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Confirm'),
+                  Visibility(
+                    visible: _resetPasswordInProgress == false,
+                    replacement: const CenteredCircularProgressIndicator(),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _onTapResetPasswordButton();
+                      },
+                      child: const Text('Confirm'),
+                    ),
                   ),
                   const SizedBox(
                     height: 48,
@@ -113,6 +140,33 @@ class _ResetPasswordScreenState
         ],
       ),
     );
+  }
+
+  void _onTapResetPasswordButton() {
+    if (_newPasswordTEController.text == _confirmPasswordTEController.text) {
+      _postResetPassword();
+    } else {
+      showSnackBarMessage(context, "Password didn't match");
+    }
+  }
+
+  Future <void> _postResetPassword() async{
+    _resetPasswordInProgress = true;
+    setState(() {});
+    Map <String, dynamic> requestBody = {
+      "email": widget.email,
+      "OTP" : widget.otp,
+      "password": _confirmPasswordTEController.text,
+    };
+    final NetworkResponse response = await NetworkCaller.postRequest(url: Urls.resetPasswordUrl, body: requestBody);
+    _resetPasswordInProgress = false;
+    if (response.isSuccess) {
+      Navigator.pushReplacementNamed(context, SignInScreen.name);
+      showSnackBarMessage(context, 'Password Changed Successfully');
+    }
+    else {
+      showSnackBarMessage(context, response.errorMessage);
+    }
   }
 
   @override

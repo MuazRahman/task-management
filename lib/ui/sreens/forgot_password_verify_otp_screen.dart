@@ -113,14 +113,17 @@ class _ForgotPasswordVerifyOtpScreenState extends State<ForgotPasswordVerifyOtpS
     final NetworkResponse response = await NetworkCaller.getRequest(
         url: Urls.recoverVerifyOTPlUrl(
             widget.email ?? '',
-            _otpTEController.text.trim()),
+            _otpTEController.text.trim(),
+        ),
     );
     _getVerifyOTPInProgress = false;
     setState(() {});
     if (response.isSuccess) {
       recoverVerifyOtp = RecoverVerifyOTP.fromJson(response.responseData!);
       if (recoverVerifyOtp!.status == 'success') {
-        Navigator.pushNamed(context, ResetPasswordScreen.name);
+        // Navigator.pushNamed(context, ResetPasswordScreen.name);
+        String otp = _otpTEController.text.trim();
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ResetPasswordScreen(email: widget.email,otp: otp,)));
       } else {
         showSnackBarMessage(context, 'No user found');
       }
@@ -149,7 +152,7 @@ class _ForgotPasswordVerifyOtpScreenState extends State<ForgotPasswordVerifyOtpS
       controller: _otpTEController,
       appContext: context,
       validator: (String? value) {
-        if (value!.trim().isEmpty ?? true) {
+        if (value!.trim().isEmpty) {
           return 'Please enter the verification OTP';
         }
         return null;
